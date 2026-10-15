@@ -326,12 +326,9 @@ Pass a lambda predicate to `.when()` to gate mocks on scenario metadata. This en
 registry.mock("get_pricing").when(
     lambda metadata: metadata.get("feature_flags", {}).get("new_pricing") is True
 ).returns({"plan": "v2", "price": 29.99})
-
-# Default pricing when flag is off
-registry.mock("get_pricing").returns({"plan": "v1", "price": 19.99})
 ```
 
-Scenario predicates are checked first. If the predicate doesn't match, the next registered mock for that tool is tried. This lets you layer conditional mocks with a fallback default.
+When the predicate doesn't match, no mock is resolved for that call. A tool name holds one mock, so registering `get_pricing` again replaces this mock instead of adding a fallback (see [Notes and Limits](#notes-and-limits)). For a conditional mock with a default, use [data-driven mocks](quickstart.md#input-based-mocking) with `register_data_driven`: list the specific cases first and end with a catch-all case that has no `input`, or pass `fallback=`.
 
 ### Combining `when()` + `echoes_input()` + `returns()`
 
